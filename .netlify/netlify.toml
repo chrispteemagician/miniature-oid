@@ -1,0 +1,35 @@
+functionsDirectory = "C:\\Users\\comed\\Desktop\\a1\\miniature-oid-FINAL\\miniature-oid\\netlify\\functions"
+functionsDirectoryOrigin = "config"
+headersOrigin = "config"
+plugins = []
+redirects = []
+
+[build]
+publish = "C:\\Users\\comed\\Desktop\\a1\\miniature-oid-FINAL\\miniature-oid"
+publishOrigin = "config"
+functions = "C:\\Users\\comed\\Desktop\\a1\\miniature-oid-FINAL\\miniature-oid\\netlify\\functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"

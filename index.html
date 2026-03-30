@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Miniature-Oid | The Painting Table</title>
+    <meta name="description" content="AI-powered miniature identification and painting advice. Upload a photo of any figure, model, or miniature. Free forever. Part of the FeelFamous village ecosystem.">
+    <meta name="theme-color" content="#2d6a4f">
+    <meta property="og:title" content="Miniature-Oid | The Painting Table">
+    <meta property="og:description" content="AI miniature expert in your pocket. Identify figures, get painting advice, and find your community. Free forever.">
+    <meta property="og:image" content="https://miniature-oid.co.uk/miniature-oid.jpg">
+    <meta property="og:url" content="https://miniature-oid.co.uk">
+    <link rel="icon" type="image/jpeg" href="miniature-oid.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; font-size: 18px; margin: 0; background: #f4f9f1; color: #0f1f14; }
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+        .font-handwritten { font-family: 'Caveat', cursive; }
+
+        html { scroll-behavior: smooth; }
+
+        .bg-deep { background: #0f1f14; }
+        .bg-mid { background: #1a3320; }
+        .bg-forest { background: #2d6a4f; }
+        .bg-gold { background: #e9c46a; }
+        .bg-cream { background: #f4f9f1; }
+        .text-forest { color: #2d6a4f; }
+        .text-gold { color: #e9c46a; }
+        .text-cream { color: #f4f9f1; }
+        .text-deep { color: #0f1f14; }
+        .border-forest { border-color: #2d6a4f; }
+
+        .header-gradient { background: linear-gradient(135deg, #0f1f14 0%, #1a3320 50%, #2a4a30 100%); }
+
+        .btn { min-height: 48px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: all 0.15s; touch-action: manipulation; display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; text-decoration: none; font-size: 16px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-forest { background: linear-gradient(135deg, #2d6a4f 0%, #1e4d38 100%); color: #f4f9f1; font-weight: 700; }
+        .btn-forest:hover { background: linear-gradient(135deg, #38875f 0%, #2d6a4f 100%); }
+        .btn-dark { background: linear-gradient(135deg, #0f1f14 0%, #1a3320 100%); color: #f4f9f1; }
+        .btn-dark:hover { background: linear-gradient(135deg, #1a3320 0%, #2a4a30 100%); }
+        .btn-gold { background: linear-gradient(135deg, #e9c46a 0%, #c9a44a 100%); color: #0f1f14; font-weight: 700; }
+        .btn-gold:hover { background: linear-gradient(135deg, #f0cc76 0%, #e9c46a 100%); }
+        .btn-outline { background: transparent; border: 2px solid #2d6a4f; color: #2d6a4f; }
+        .btn-outline:hover { background: #2d6a4f; color: #f4f9f1; }
+
+        .card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(15,31,20,0.08); padding: 24px; margin-bottom: 20px; }
+
+        .upload-box { background: #f4f9f1; border: 3px dashed #2d6a4f; border-radius: 16px; padding: 32px 16px; text-align: center; cursor: pointer; transition: all 0.2s; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .upload-box:hover { border-color: #e9c46a; background: #eef5e8; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,106,79,0.2); }
+        .upload-box:active { transform: scale(0.98); }
+
+        .nav-tab { flex: 1; padding: 14px 8px; font-weight: 600; font-size: 14px; border: none; background: transparent; cursor: pointer; min-height: 52px; color: #e9c46a; border-bottom: 3px solid transparent; transition: all 0.15s; white-space: nowrap; }
+        .nav-tab.active { background: white; color: #2d6a4f; font-weight: 700; border-bottom-color: #2d6a4f; }
+        .nav-tab:hover:not(.active) { background: rgba(45,106,79,0.08); }
+
+        .qa-item { border: 2px solid #d8e8d0; border-radius: 16px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.15s; }
+        .qa-item:hover { border-color: #2d6a4f; }
+        .qa-question { padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 16px; min-height: 48px; }
+        .qa-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 16px; font-size: 15px; color: #4b5563; line-height: 1.6; }
+        .qa-answer.open { max-height: 600px; padding: 0 16px 16px; }
+
+        .chat-container { max-height: 400px; overflow-y: auto; scroll-behavior: smooth; }
+        .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 16px; margin-bottom: 8px; font-size: 15px; line-height: 1.5; word-wrap: break-word; }
+        .chat-user { background: #2d6a4f; color: #f4f9f1; margin-left: auto; border-bottom-right-radius: 4px; }
+        .chat-reg { background: white; color: #0f1f14; border: 2px solid #d8e8d0; border-bottom-left-radius: 4px; }
+        .chat-typing span { animation: blink 1.4s infinite; display: inline-block; }
+        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .learn-tab { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; min-height: 48px; border: 2px solid #d8e8d0; background: white; transition: all 0.15s; }
+        .learn-tab.active { background: #2d6a4f; color: #f4f9f1; border-color: #2d6a4f; }
+        .learn-tab:hover:not(.active) { border-color: #2d6a4f; }
+
+        .section-fade { opacity: 0; transform: translateY(20px); transition: opacity 0.4s, transform 0.4s; }
+        .section-fade.visible { opacity: 1; transform: translateY(0); }
+
+        .result-card { background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1; border-radius: 24px; padding: 24px; }
+
+        .loading-spinner { animation: spin 1.5s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .hidden { display: none !important; }
+
+        .oid-pill { display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; transition: all 0.15s; min-height: 40px; }
+        .oid-pill:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        .amazon-btn { background: #ff9900; color: #111; padding: 12px 20px; border-radius: 10px; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 8px; min-height: 48px; transition: background 0.15s; }
+        .amazon-btn:hover { background: #ffad33; }
+
+        @media (max-width: 640px) {
+            body { font-size: 16px; }
+            .card { padding: 20px; }
+            .nav-tab { font-size: 12px; padding: 12px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="header-gradient text-center py-10 px-4">
+    <div class="text-7xl mb-4">🔍</div>
+    <h1 class="text-5xl sm:text-6xl font-extrabold text-cream mb-2">Miniature-Oid</h1>
+    <p class="text-xl font-bold text-gold mb-1">THE PAINTING TABLE</p>
+    <p class="font-handwritten text-2xl text-cream opacity-80">"Every detail tells a story"</p>
+</header>
+
+<!-- Free-to-use banner -->
+<div style="background: linear-gradient(135deg, #2d6a4f, #1e4d38);" class="text-center py-3 px-4">
+    <p class="text-sm font-semibold text-cream">
+        Free to use, forever. Join the <a href="https://feelfamous.com" class="underline font-bold">FeelFamous Family</a> to unlock
+        <span class="bg-yellow-300 text-black px-2 py-0.5 rounded font-bold text-xs">PRO</span> features across ALL -Oid Apps.
+    </p>
+</div>
+
+<!-- Action buttons -->
+<div class="bg-cream py-4 px-4">
+    <div class="max-w-2xl mx-auto flex flex-wrap gap-3 justify-center">
+        <a href="https://feelfamous.com/founders.html" class="btn btn-dark text-sm">Join The Village</a>
+        <a href="mailto:chris@chrisptee.co.uk" class="btn text-sm" style="background:#3b82f6;color:white">Email</a>
+        <a href="https://wa.me/447976884254" class="btn text-sm" style="background:#16a34a;color:white">WhatsApp</a>
+        <a href="https://www.patreon.com/chrisptee" target="_blank" class="btn btn-gold text-sm">Join on Patreon</a>
+    </div>
+</div>
+
+<!-- User Status Bar -->
+<div id="userBar" class="hidden" style="background: linear-gradient(135deg, #2d6a4f, #1e4d38);">
+    <div class="max-w-2xl mx-auto flex items-center justify-between text-sm py-2 px-4 text-cream font-semibold">
+        <div><span id="userBadge"></span> <span id="userName"></span> &bull; <span id="userKudos">0</span> Kudos</div>
+        <button onclick="signOut()" class="underline text-xs">Sign out</button>
+    </div>
+</div>
+
+<!-- ==================== NAVIGATION TABS ==================== -->
+<div style="background: #1a3320;" class="border-b border-forest sticky top-0 z-40">
+    <div class="max-w-2xl mx-auto flex overflow-x-auto">
+        <button onclick="showSection('pageHome')" class="nav-tab active" id="tab-pageHome">🔍 Home</button>
+        <button onclick="showSection('pageLearn')" class="nav-tab" id="tab-pageLearn">📚 Learn</button>
+        <button onclick="showSection('pageQA')" class="nav-tab" id="tab-pageQA">❓ Q&A</button>
+        <button onclick="showSection('pageReg')" class="nav-tab" id="tab-pageReg">💬 Reg</button>
+        <button onclick="showSection('pageGear')" class="nav-tab" id="tab-pageGear">🔧 Gear</button>
+        <button onclick="showSection('pageMeet')" class="nav-tab" id="tab-pageMeet">📍 Meet</button>
+        <button onclick="showSection('pageVillage')" class="nav-tab" id="tab-pageVillage">🏘️ Village</button>
+    </div>
+</div>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="max-w-2xl mx-auto px-4 py-6">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: HOME — AI IDENTIFIER                              -->
+<!-- ============================================================ -->
+<div id="section-pageHome">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <h2 class="text-xl font-bold mb-3">Alright. Reg here.</h2>
+        <p class="text-sm opacity-90 mb-3">First Airfix kit at eight years old, first lead figure at twelve, first tournament army at seventeen. Been painting miniatures since 1978 — everything from 6mm ancients to 54mm display pieces. If it's got a base and a paintjob, I've either painted it, broken it, stripped it back, or painted it again.</p>
+        <p class="text-sm opacity-80">Snap it. I'll tell you what it is, who made it, and how to make it look better than it does right now.</p>
+    </div>
+
+    <!-- Mode Toggle -->
+    <div class="card">
+        <div class="flex gap-2 mb-4">
+            <button onclick="setMode('identify')" id="modeIdentify" class="flex-1 btn btn-forest text-sm">🔍 Identify</button>
+            <button onclick="setMode('roast')" id="modeRoast" class="flex-1 btn btn-outline text-sm">🔥 Roast My Paintjob</button>
+        </div>
+
+        <h2 class="text-xl font-bold text-center mb-2" id="oracleTitle">Snap It. Name It. Paint It Better.</h2>
+        <p class="text-gray-500 text-sm text-center mb-6" id="oracleSubtitle">Upload a photo of any miniature, figure, or scale model</p>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="upload-box" onclick="document.getElementById('cameraInput').click()">
+                <div class="text-5xl mb-2">📷</div>
+                <p class="font-bold text-sm">Camera</p>
+            </div>
+            <div class="upload-box" onclick="document.getElementById('galleryInput').click()">
+                <div class="text-5xl mb-2">🖼️</div>
+                <p class="font-bold text-sm">Gallery</p>
+            </div>
+        </div>
+
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleUpload(this)">
+        <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="handleUpload(this)">
+
+        <p class="text-xs text-gray-400 mt-4 text-center">Good light, neutral background. Multiple angles help. Show the base too — it tells me a lot.</p>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loadingView" class="hidden card text-center py-12">
+        <div class="text-6xl mb-4 loading-spinner inline-block">🔍</div>
+        <h3 class="text-xl font-bold mb-2">Reg's got his magnifier out...</h3>
+        <p id="loadingMessage" class="text-gray-500 text-sm mb-4 pulse">Checking the sculptor's style...</p>
+        <p class="text-xs text-gray-400">Taking a moment... <span id="loadingTimer" class="font-bold text-forest"></span></p>
+    </div>
+
+    <!-- Result view -->
+    <div id="resultView" class="hidden">
+        <div class="result-card mb-4">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-3xl">🔍</span>
+                <h3 class="text-xl font-bold" id="resultTitle">Miniature Identified</h3>
+            </div>
+            <div id="resultDescription" class="text-sm opacity-90 leading-relaxed whitespace-pre-wrap"></div>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="shareResult()" class="btn btn-forest flex-1" style="min-height:48px;">Share</button>
+            <button onclick="downloadResult()" class="btn btn-dark flex-1" style="min-height:48px;">Save</button>
+            <button onclick="resetView()" class="btn btn-outline flex-1" style="min-height:48px;">New Scan</button>
+        </div>
+        <div id="signInPrompt" class="mt-4 p-4 rounded-2xl text-center" style="background: #eef5e8; border: 2px solid #d8e8d0;">
+            <p class="text-sm font-semibold mb-3">Sign in to save results, earn Kudos, and join the village</p>
+            <div id="patreonStatus" class="hidden mb-3 text-sm"></div>
+            <button id="patreonSignInBtn" onclick="signInWithPatreon()" class="btn btn-forest w-full text-sm">Sign in with Patreon</button>
+        </div>
+    </div>
+
+    <!-- Broadcast -->
+    <div id="broadcastSection" class="hidden card" style="background: linear-gradient(135deg, #1a3320, #0f1f14); color: #f4f9f1;">
+        <div id="emergencyBanner" class="hidden bg-red-600 text-white text-center py-2 px-4 rounded-xl mb-3 font-bold text-sm">URGENT — VILLAGE NOTICE</div>
+        <h3 class="font-bold mb-3 text-gold">Village Broadcast</h3>
+        <div class="rounded-xl overflow-hidden mb-3" style="position:relative;padding-bottom:56.25%;height:0;">
+            <iframe id="broadcastVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p id="broadcastTitle" class="text-sm opacity-80"></p>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: LEARN                                             -->
+<!-- ============================================================ -->
+<div id="section-pageLearn" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <h2 class="text-2xl font-bold mb-2">📚 Reg's Painting Library</h2>
+        <p class="text-sm opacity-80">46 years of techniques, mistakes, and things that actually work. No fluff.</p>
+    </div>
+
+    <div class="card">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="showLearnTab('techniques')" id="learnTab-techniques" class="learn-tab active">🖌️ Techniques</button>
+            <button onclick="showLearnTab('ranges')" id="learnTab-ranges" class="learn-tab">🎨 Paint Ranges</button>
+            <button onclick="showLearnTab('scales')" id="learnTab-scales" class="learn-tab">📏 Scales & Ranges</button>
+        </div>
+
+        <div id="learnContent-techniques">
+            <h3 class="font-bold text-lg mb-4 text-forest">Core Painting Techniques</h3>
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Basecoating</h4>
+                    <p class="text-sm text-gray-700">Thin paint to milk consistency. Two thin coats beat one thick coat every time. Thick paint fills in detail and you'll never get it back. Use a medium brush and work methodically. Prime first — grey for dark colours, white for bright colours, black for a grim/gritty look.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Washing / Shading</h4>
+                    <p class="text-sm text-gray-700">Washes flow into recesses and create instant shadow. Citadel Agrax Earthshade, Nuln Oil, and Reikland Fleshshade are workhorses. Army Painter Dark Tone and Strong Tone are excellent value. Apply over a sealed basecoat, let gravity do the work. Don't glob it on.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Drybrushing</h4>
+                    <p class="text-sm text-gray-700">Load a stiff brush, wipe almost all paint off on a tissue, then lightly drag across raised surfaces. Picks out edges and texture instantly. Perfect for fur, hair, chainmail, stone, wood. Works best on textured surfaces. Don't skip this step — it transforms a flat model.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Edge Highlighting</h4>
+                    <p class="text-sm text-gray-700">The signature of a display piece. Pick up a lighter mix of your colour and run a fine brush along raised edges. Start with a broader highlight, then a sharper bright line at corners. Needs a steady hand and patience. The single skill that separates good from great.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Glazing</h4>
+                    <p class="text-sm text-gray-700">Very thin, transparent paint washes over an area to tint without covering. Use a glazing medium or heavily thin with water + flow improver. Builds up colour gradually, adds OSL (object source lighting) effects, rescues colours that went wrong. A glaze of red over orange deepens it beautifully.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">Basing</h4>
+                    <p class="text-sm text-gray-700">The base finishes the model. A brilliant paintjob on a plain black base looks unfinished. Texture paste, PVA + sand, static grass, tufts — all cheap and transformative. Match the base to the world your model inhabits. Snow? Urban rubble? Jungle floor? The base tells the story.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="learnContent-ranges" class="hidden">
+            <h3 class="font-bold text-lg mb-4 text-forest">Paint Ranges — What Reg Actually Uses</h3>
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">Citadel (Games Workshop)</h4>
+                    <p class="text-sm text-gray-700">The industry standard. Expensive but consistent. The Contrast/Shade/Layer/Base system works. Agrax Earthshade is the most useful paint ever made. Contrast paints are genuinely brilliant for batch painting. Buy where they're available — the pots dry out if you don't seal them properly.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">Vallejo</h4>
+                    <p class="text-sm text-gray-700">Superior dropper bottles — no dried paint lids. Model Colour for general use. Game Colour slightly more vibrant for fantasy. Model Air pre-thinned for airbrush. The best value-per-ml in the hobby. Metallics are outstanding. Reg's personal recommendation for anyone starting out.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">Army Painter</h4>
+                    <p class="text-sm text-gray-700">Speedpaints are the Contrast competitor — quick and effective. Warpaints are solid workhorse paints. The dip (quick shade) is legendary for batch painting armies fast. Good for beginners who want results without faff. Fanatic range updated the formula significantly.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">Scale75 / Infinity</h4>
+                    <p class="text-sm text-gray-700">High-end, slightly grittier finish ideal for display pieces. Excellent for realistic skin tones and non-metallic metals (NMM). More demanding to use but the results at competition level are hard to beat. Not for beginners — get the basics down first.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">AK Interactive / MIG</h4>
+                    <p class="text-sm text-gray-700">Scale modelling crossover paints. Excellent weathering products — rust effects, oil paints, pigments. If you're painting vehicles or terrain, these are essential. AK real metal paints are outstanding.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="learnContent-scales" class="hidden">
+            <h3 class="font-bold text-lg mb-4 text-forest">Scales, Manufacturers & Ranges</h3>
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">28mm / 32mm — The Mainstream</h4>
+                    <p class="text-sm text-gray-700">Warhammer 40K, Age of Sigmar, Dungeons & Dragons, most tabletop RPG figures. Games Workshop dominates but Privateer Press, Mantic, Warlord, Reaper, and hundreds of boutique makers all produce here. Most tutorials assume this scale.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">15mm & 10mm — Historical Wargaming</h4>
+                    <p class="text-sm text-gray-700">Flames of War (15mm WWII), Pendraken (10mm), Baccus (6mm). The scale of serious historical wargamers. Technically demanding — less detail but you're painting hundreds. Drybrushing and washes do most of the heavy lifting.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #2d6a4f;">
+                    <h4 class="font-bold mb-2">54mm & 75mm — Display Pieces</h4>
+                    <p class="text-sm text-gray-700">Andrea Miniatures, Pegaso, Romeo Models. Not for gaming — for competition and display. Requires advanced techniques: NMM, OSL, fine blending. These are the pieces you see at Golden Demon and Salute. The full-size canvas of the hobby.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">Key UK Manufacturers</h4>
+                    <p class="text-sm text-gray-700">Games Workshop (Nottingham) — industry giant. Warlord Games (Nottingham) — historical and Beyond the Gates of Antares. North Star Military Figures — Osprey games, Frostgrave. Perry Miniatures — exceptional historical sculpts by the Perry twins. Victrix — hard plastic historicals. Footsore Miniatures — Dark Ages specialists.</p>
+                </div>
+                <div class="p-4 rounded-xl" style="background:#f4f9f1; border-left: 4px solid #e9c46a;">
+                    <h4 class="font-bold mb-2">The Resin Revolution</h4>
+                    <p class="text-sm text-gray-700">3D printing and resin casting have changed everything. Kickstarter boutique ranges from Corvus Belli, Raging Heroes, Creature Caster. Independent sculptors selling STLs directly. Wash resin in IPA before painting — always. Prime heavily — resin doesn't take paint as well as metal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: Q&A                                               -->
+<!-- ============================================================ -->
+<div id="section-pageQA" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <h2 class="text-2xl font-bold mb-2">❓ Common Questions</h2>
+        <p class="text-sm opacity-80">What Reg gets asked at every show. With straight answers.</p>
+    </div>
+
+    <div class="card">
+        <div class="space-y-2">
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>How do I stop getting brush strokes in my basecoat?</span><span>+</span></div>
+                <div class="qa-answer">Thin your paint. If you can't see through it on your palette it's too thick. Add water a drop at a time until it flows smoothly. Two thin coats always beat one thick coat. Use a medium brush, not a big one — you have more control. Let each coat fully dry before the next. Patience is the most underrated painting skill.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>What's the best way to start as a complete beginner?</span><span>+</span></div>
+                <div class="qa-answer">Buy one cheap box of plastics (Warhammer Starter Set, Oathmark, Frostgrave soldiers). Get Citadel or Army Painter starter paint sets. Watch YouTube — Painting Buddha, Miniac, Luke's APS, and Squidmar are all excellent. Don't buy 30 pots of paint you don't need. Learn basecoat, wash, drybrush first — that alone gets you 80% of the way there. Don't expect your first model to be brilliant. Reg's first model looked like it was painted by a boot.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>Should I prime? Which primer?</span><span>+</span></div>
+                <div class="qa-answer">Yes. Always prime. Without it, paint doesn't adhere properly and will chip and flake. For dark/gritty armies: black or grey primer. For bright colours or NMM: white. For a midtone shortcut: grey. Spray cans (Army Painter, Citadel) are fastest. Brush-on primer works fine for small batches. Vallejo primer through an airbrush gives the finest coat. Never prime in very cold or humid conditions — the finish will go grainy.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>What brushes do I actually need?</span><span>+</span></div>
+                <div class="qa-answer">Three brushes to start: a size 2 for basecoating, a size 1 for general work, and a fine detail brush (0 or 00) for eyes and small work. Kolinsky sable is the gold standard — Raphael 8404, Winsor & Newton Series 7. Synthetic brushes wear faster but are fine for washing and drybrushing (which destroys brushes). Keep detail brushes for detail only. Clean brushes immediately after use — dried paint kills them.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>How do I paint eyes on 28mm figures?</span><span>+</span></div>
+                <div class="qa-answer">The honest answer: most painters cheat, and that's fine. Fill the eye socket with a dark wash, then add a small dot of white, then an even smaller dot of dark (brown or black) in the centre. The brain fills in the rest. For beginners, leaving eyes as darkened recesses reads fine at tabletop distance. Reserve the proper two-highlight eye technique for display pieces or heroes. If you go wrong, paint over and start again — eyes take practice.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>How do I strip paint off a model I've ruined?</span><span>+</span></div>
+                <div class="qa-answer">Dettol (brown, concentrated) is the UK standard. Soak in Dettol for a few hours, scrub with an old toothbrush under running water. Resin: IPA (isopropyl alcohol) from a chemist — soak for 30 mins max, resin can get brittle. Plastic: Dettol only, not IPA — it melts plastic. Metal: almost anything works, even nail polish remover. Don't use nail polish remover on plastic. Ever.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>How do I batch paint an army efficiently?</span><span>+</span></div>
+                <div class="qa-answer">Assembly-line paint in groups of 10-15. One colour across the whole batch before moving to the next. Prime everything. Basecoat in bulk. Wash everything in one pass. Drybrush all at once. Final details on each individually. Accept that batch-painted models are "good enough at arm's length" — not display pieces. The goal is a painted army on the table, not a competition entry. Done is better than perfect.</div>
+            </div>
+
+            <div class="qa-item" onclick="toggleQA(this)">
+                <div class="qa-question"><span>Do I need a varnish/sealer?</span><span>+</span></div>
+                <div class="qa-answer">Yes, for gaming models — absolutely. Matt varnish (Testors Dullcote, Army Painter Anti-Shine) protects the paintjob from handling. Games chew through unvarnished models fast. For display pieces, skip the varnish or use gloss only on gems and eyes to make them pop. Never spray varnish in cold or humid conditions — it goes cloudy ("frosting") and ruins everything. Brush-on varnish is safer if you're nervous about the weather.</div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: ASK REG                                           -->
+<!-- ============================================================ -->
+<div id="section-pageReg" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-4xl">🔍</span>
+            <div>
+                <h2 class="text-xl font-bold">Ask Reg</h2>
+                <p class="text-sm opacity-70">46 years of miniatures. Ask him anything.</p>
+            </div>
+        </div>
+        <p class="text-sm opacity-80">Reg doesn't sugarcoat it. If your basecoat's too thick, he'll tell you. If your highlights are brilliant, he'll tell you that too.</p>
+    </div>
+
+    <div class="card">
+        <p class="text-sm font-semibold mb-3 text-gray-600">Quick questions:</p>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="askRegQuick('How do I thin my paints properly?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">Thinning paints?</button>
+            <button onclick="askRegQuick('What is the best wash for skin tones?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">Skin tone wash?</button>
+            <button onclick="askRegQuick('How do I paint non-metallic metal?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">NMM help?</button>
+            <button onclick="askRegQuick('How do I fix a mistake on a model?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">Fix a mistake?</button>
+            <button onclick="askRegQuick('What is the best airbrush for beginners?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">Airbrush tips?</button>
+            <button onclick="askRegQuick('How do I paint OSL object source lighting?')" class="btn btn-outline text-xs" style="min-height:40px; padding:8px 12px;">OSL lighting?</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div id="chatMessages" class="chat-container mb-4">
+            <div class="flex items-start gap-2 mb-3">
+                <span class="text-2xl flex-shrink-0">🔍</span>
+                <div class="chat-bubble chat-reg">Reg here. 46 years at the painting table. Started with Humbrol enamels on Airfix kits and I've never really stopped. Ask me anything — about identifying a figure, painting techniques, which paints to buy, or how to rescue something that's gone wrong. No question too basic. We all started somewhere.</div>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <input type="text" id="regInput" placeholder="Ask Reg anything..." class="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none text-sm" style="border-color: #2d6a4f; min-height: 48px;" onkeypress="if(event.key==='Enter')askReg()">
+            <button onclick="askReg()" class="btn btn-forest px-6" style="min-height:48px;">Send</button>
+        </div>
+    </div>
+
+    <div class="card text-center" style="background: #eef5e8;">
+        <p class="text-sm font-semibold mb-3">Join the village to save conversations and earn Kudos</p>
+        <div id="patreonStatusReg" class="hidden mb-3 text-sm"></div>
+        <button id="patreonSignInBtnReg" onclick="signInWithPatreon()" class="btn btn-forest text-sm w-full">Sign in with Patreon</button>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: GEAR                                              -->
+<!-- ============================================================ -->
+<div id="section-pageGear" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <h2 class="text-2xl font-bold mb-2">🔧 Reg's Gear List</h2>
+        <p class="text-sm opacity-80">What's actually on Reg's painting table. No sponsorship, no fluff.</p>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-4 text-forest">The Essentials</h3>
+        <div class="space-y-4">
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Kolinsky Sable Brushes</h4>
+                <p class="text-sm text-gray-600 mb-2">Raphael 8404 or Winsor & Newton Series 7. Buy a size 0, 1, and 2. They hold a point, hold paint, and last years if you look after them. More important than any paint you buy.</p>
+                <a href="https://www.amazon.co.uk/s?k=kolinsky+sable+miniature+painting+brush&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Citadel Contrast / Army Painter Speedpaints</h4>
+                <p class="text-sm text-gray-600 mb-2">The fastest route from primed to table-ready. One coat over white primer gives basecoat + shade simultaneously. Brilliant for batch painting.</p>
+                <a href="https://www.amazon.co.uk/s?k=citadel+contrast+paint+set&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Army Painter Quickshade Wash Set</h4>
+                <p class="text-sm text-gray-600 mb-2">Strong Tone, Soft Tone, Dark Tone. The trinity of washes. Buy these before anything else. They do more work than any other product in the range.</p>
+                <a href="https://www.amazon.co.uk/s?k=army+painter+quickshade+wash+set&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Vallejo Model Colour Starter Set</h4>
+                <p class="text-sm text-gray-600 mb-2">72 bottles in dropper format. Saves you hunting for individual colours. Vallejo metallics especially are superb. The best value paint purchase you can make.</p>
+                <a href="https://www.amazon.co.uk/s?k=vallejo+model+colour+starter+set&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Wet Palette</h4>
+                <p class="text-sm text-gray-600 mb-2">Keeps paint workable for hours. Masterson Sta-Wet, or make your own with a Tupperware lid, kitchen sponge, and baking paper. Game-changing for blending.</p>
+                <a href="https://www.amazon.co.uk/s?k=wet+palette+miniature+painting&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Spray Primer</h4>
+                <p class="text-sm text-gray-600 mb-2">Army Painter Matt Black or Grey primer. Citadel equivalent. Light even coats from 30cm. Never prime in the cold or damp. Foundation of every paintjob.</p>
+                <a href="https://www.amazon.co.uk/s?k=army+painter+spray+primer&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+            <div class="p-4 rounded-xl" style="background:#f4f9f1;">
+                <h4 class="font-bold mb-1">Daylight Lamp</h4>
+                <p class="text-sm text-gray-600 mb-2">Painting in yellow overhead light = your colours will look completely different in daylight. Daylight bulb or LED painting lamp is essential. Your eyes will thank you too.</p>
+                <a href="https://www.amazon.co.uk/s?k=daylight+lamp+painting+craft&tag=chrisptee-21" target="_blank" rel="noopener" class="amazon-btn text-sm">Find on Amazon</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card text-center" style="background: #eef5e8;">
+        <p class="text-sm text-gray-500">Amazon UK affiliate links. Small commission keeps this village running. Reg only recommends what he actually uses.</p>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: MEET — what3words                                 -->
+<!-- ============================================================ -->
+<div id="section-pageMeet" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <div class="text-5xl mb-3 text-center">📍</div>
+        <h2 class="text-2xl font-bold mb-2 text-center" style="color: #e9c46a;">Meeting Point Generator</h2>
+        <p class="text-sm opacity-80 text-center">At a show or convention? Tell people exactly where you are — in three words. Share your display table, the painting competition, the entrance. Dead simple, dead precise.</p>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-4 text-center">What are you pinning?</h3>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="meetGetLocation('🔍 My Display')" class="btn btn-forest w-full" style="min-height:56px; font-size:1rem;">🔍 My Display</button>
+            <button onclick="meetGetLocation('🎨 The Painting Table')" class="btn btn-dark w-full" style="min-height:56px; font-size:1rem;">🎨 The Painting Table</button>
+            <button onclick="meetGetLocation('🚗 My Car')" class="btn btn-outline w-full" style="min-height:56px; font-size:1rem;">🚗 My Car</button>
+            <button onclick="meetGetLocation('🎪 This Show')" class="btn btn-outline w-full" style="min-height:56px; font-size:1rem;">🎪 This Show</button>
+        </div>
+    </div>
+
+    <div id="meetLocationCard" class="card hidden" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1;">
+        <p class="text-sm mb-1 font-semibold" style="color: #e9c46a;" id="meetLabelDisplay">Your location:</p>
+        <p class="text-sm opacity-70 mb-2 font-semibold" id="meetCoordsDisplay"></p>
+        <p class="text-4xl font-extrabold mb-3 tracking-wide" id="meetW3W" aria-live="polite" style="color: #e9c46a;">—</p>
+        <a id="meetMapLink" href="#" target="_blank" rel="noopener" style="color: #e9c46a; font-weight: 700;">Open on what3words map ↗</a>
+        <div class="flex gap-3 mt-4">
+            <button onclick="meetCopy()" class="btn btn-forest flex-1" style="min-height:48px;">Copy</button>
+            <button onclick="meetShare()" class="btn btn-dark flex-1" style="min-height:48px;">Share</button>
+        </div>
+    </div>
+
+    <div id="meetQrCard" class="card hidden text-center">
+        <h3 class="font-bold mb-3">Share via QR</h3>
+        <canvas id="meetQrCanvas" class="mx-auto rounded-xl shadow-lg" style="max-width:220px;"></canvas>
+        <div class="flex gap-3 mt-4">
+            <button onclick="meetGenerateQR()" class="btn btn-forest flex-1" style="min-height:48px;">Generate QR</button>
+            <button onclick="meetDownloadQR()" class="btn btn-dark flex-1" style="min-height:48px;">Download</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-3">Or type a what3words address</h3>
+        <div class="relative">
+            <input type="text" id="meetManualInput" placeholder="e.g. filled.count.soap"
+                oninput="meetAutoSuggest(this.value)"
+                class="w-full px-4 py-3 border-2 rounded-xl focus:outline-none"
+                style="border-color: #2d6a4f; min-height: 48px; font-size: 1rem;"
+                autocomplete="off" spellcheck="false">
+            <div id="meetSuggestList" class="hidden absolute z-50 w-full bg-white border-2 rounded-xl shadow-xl mt-1" style="border-color: #2d6a4f;"></div>
+        </div>
+        <button onclick="meetLookup()" class="btn btn-forest w-full mt-3" style="min-height:56px; font-size:1.05rem;">Look Up Address</button>
+        <p id="meetManualStatus" class="hidden text-sm mt-2 text-center font-semibold" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="card text-center" style="background: #eef5e8;">
+        <p class="text-sm opacity-70">Powered by <a href="https://what3words.com" target="_blank" rel="noopener" style="color: #2d6a4f; font-weight: 700;">what3words</a> — every 3m² on Earth has a unique 3-word address.</p>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: VILLAGE                                           -->
+<!-- ============================================================ -->
+<div id="section-pageVillage" class="hidden">
+
+    <div class="card" style="background: linear-gradient(135deg, #1a3320 0%, #0f1f14 100%); color: #f4f9f1; text-align: center;">
+        <div class="text-5xl mb-3">🏘️</div>
+        <h2 class="text-2xl font-bold mb-1">The -Oid Villages</h2>
+        <p class="text-sm opacity-80">Same AI brain, different expert heads. Each village has its own community.</p>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-4">Explore the Family</h3>
+        <div class="flex flex-wrap gap-2 justify-center">
+            <a href="https://magic-oid.co.uk" class="oid-pill bg-purple-100 text-purple-800">🎩 Magic-Oid</a>
+            <a href="https://radi-oid.co.uk" class="oid-pill bg-orange-100 text-orange-800">📻 Radi-Oid</a>
+            <a href="https://sail-oid.co.uk" class="oid-pill bg-blue-100 text-blue-800">⛵ Sail-Oid</a>
+            <a href="https://guit-oid.co.uk" class="oid-pill bg-amber-100 text-amber-800">🎸 Guit-Oid</a>
+            <a href="https://vinyl-oid.co.uk" class="oid-pill bg-purple-100 text-purple-800">💿 Vinyl-Oid</a>
+            <a href="https://coin-oid.co.uk" class="oid-pill bg-amber-100 text-amber-800">🪙 Coin-Oid</a>
+            <a href="https://watch-oid.co.uk" class="oid-pill bg-cyan-100 text-cyan-800">⌚ Watch-Oid</a>
+            <a href="https://camera-oid.co.uk" class="oid-pill bg-orange-100 text-orange-800">📷 Camera-Oid</a>
+            <a href="https://stamp-oid.co.uk" class="oid-pill bg-rose-100 text-rose-800">📮 Stamp-Oid</a>
+            <a href="https://cannabin-oid.co.uk" class="oid-pill bg-green-100 text-green-800">🌿 Cannabin-Oid</a>
+            <a href="https://fish-oid.co.uk" class="oid-pill bg-teal-100 text-teal-800">🐟 Fish-Oid</a>
+            <a href="https://designer-oid.co.uk" class="oid-pill bg-rose-100 text-rose-800">👗 Designer-Oid</a>
+            <span class="oid-pill font-bold" style="background: #2d6a4f; color: #f4f9f1;">🔍 Miniature-Oid &mdash; You're Here!</span>
+            <a href="https://spicylister.com" class="oid-pill bg-red-100 text-red-800">🌶️ SpicyLister</a>
+        </div>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #e9c46a 0%, #c9a44a 100%); border: none;">
+        <div class="text-center text-deep">
+            <div class="text-4xl mb-2">🏘️</div>
+            <h3 class="text-xl font-bold mb-2">Run Your Own Miniature-Oid Village</h3>
+            <p class="text-sm opacity-90 mb-4">Got a painting studio, a club, or expertise worth sharing? Get your own hamlet — your page, your QR code, your corner of the village.</p>
+            <a href="https://magic-oid.co.uk/hamlet/signup" class="btn w-full" style="background:white;color:#1e4d38;font-weight:700;">Claim Your Hamlet</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold text-lg mb-4 text-center">Village Membership</h3>
+        <div class="border-2 border-gray-200 rounded-2xl p-5 mb-4">
+            <h4 class="font-bold mb-2">Free Villager</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>- AI miniature identification (unlimited)</li>
+                <li>- Ask Reg chatbot</li>
+                <li>- Learning library</li>
+                <li>- what3words Meet tool</li>
+                <li>- Village access</li>
+            </ul>
+        </div>
+        <div class="border-2 rounded-2xl p-5 mb-4" style="border-color: #2d6a4f; background: linear-gradient(135deg, #f4f9f1, #eef5e8);">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-bold">Pro Member</h4>
+                <span class="bg-yellow-300 text-black px-2 py-0.5 rounded font-bold text-xs">PATREON</span>
+            </div>
+            <ul class="text-sm text-gray-600 space-y-1 mb-4">
+                <li>✓ Unlimited scan history</li>
+                <li>✓ Kudos points & leaderboard</li>
+                <li>✓ Village profile</li>
+                <li>✓ Early access to new -Oid apps</li>
+                <li>✓ Direct line to Chris</li>
+            </ul>
+            <div id="villageSignIn">
+                <div id="patreonStatusVillage" class="hidden mb-3 text-sm"></div>
+                <button id="patreonSignInBtnVillage" onclick="signInWithPatreon()" class="btn btn-forest w-full text-sm">Sign in with Patreon</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-3">Recent Village Activity</h3>
+        <div id="activityList" class="space-y-2 text-sm text-gray-500">
+            <p class="text-center">Loading...</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="font-bold mb-4">Kudos Leaderboard</h3>
+        <div id="leaderboardList" class="space-y-3">
+            <p class="text-center text-gray-400 text-sm">Loading...</p>
+        </div>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%); color: white; border-radius: 20px;">
+        <h3 class="text-xl font-bold mb-2">Noisy Brain?</h3>
+        <p class="text-sm opacity-90 mb-3">Miniature painting is one of the best hobbies for ADHD and autism. The hyper-focus, the detail work, the meditative rhythm of base-wash-drybrush — it was practically designed for us. You're in very good company here.</p>
+        <a href="https://feelfamous.com" target="_blank" rel="noopener" class="btn w-full" style="background:white;color:#4338ca;font-weight:700;">FeelFamous Community</a>
+    </div>
+
+</div>
+
+</main>
+
+<footer class="text-center py-8 px-4 text-sm" style="background: #0f1f14; color: #e9c46a;">
+    <p class="mb-1 font-bold">Miniature-Oid — The Painting Table</p>
+    <p class="text-xs opacity-70">Part of the <a href="https://feelfamous.com" class="underline">FeelFamous</a> village ecosystem</p>
+    <p class="text-xs opacity-50 mt-2">miniature-oid.co.uk</p>
+</footer>
+
+<canvas id="resultCanvas" class="hidden"></canvas>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+const CONFIG = {
+    oidName: 'Miniature-Oid',
+    oidSlug: 'miniature',
+    primaryColor: '#2d6a4f',
+    loadingIcon: '🔍',
+    supabaseUrl: 'https://pdnjeynugptnavkdbmxh.supabase.co',
+    supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkbmpleW51Z3B0bmF2a2RibXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMTEzMDAsImV4cCI6MjA4NDU4NzMwMH0.GawisR01EykMtdauBMxenmHF2NXDMzDOJl8WgzkwFQo',
+    amazonTag: 'chrisptee-21',
+    adminEmails: ['chris@chrisptee.co.uk', 'chris@chrisptee.com', 'glowgadgets@gmail.com']
+};
+
+const PATREON_CLIENT_ID = 'A-K7cVCZBl7mQZDlrq0obIq7Jm0RPYAMGstfBsUyEeX-5e6WvU24ZWMTGBuypxot';
+const PATREON_OAUTH_URL = `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${PATREON_CLIENT_ID}&redirect_uri=https://miniature-oid.co.uk/auth/patreon&scope=identity%20identity.memberships`;
+const W3W_API_KEY = 'R7VL7Q93';
+
+let patreonSession = null;
+let meetCurrentW3W = '';
+let meetCurrentLabel = '';
+let meetAutoSuggestTimer = null;
+
+const { createClient } = supabase;
+const sb = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+let currentUser = null;
+let currentResult = null;
+let currentMode = 'identify';
+let chatHistory = [];
+let loadingTimerInterval = null;
+let loadingStartTime = null;
+let messageRotationInterval = null;
+
+const patienceMessages = [
+    "Checking the sculptor's style...",
+    "Cross-referencing manufacturer catalogues...",
+    "Identifying the scale and material...",
+    "Looking for casting marks...",
+    "Checking paint range compatibility...",
+    "Assessing the base style...",
+    "Comparing with known ranges...",
+    "Reg's got his magnifier out...",
+    "Checking for conversion work...",
+    "Identifying the mould lines...",
+    "Looking at the detail level...",
+    "Checking historical accuracy...",
+    "Consulting the painting guides...",
+    "Examining the primer coat...",
+    "Identifying the plastic type..."
+];
+
+window.onload = async function() {
+    initSectionReveal();
+    loadBroadcast();
+    restorePatreonSession();
+    if (window.location.search.includes('code=') && window.location.pathname.includes('/auth/patreon')) {
+        await handlePatreonCallback();
+    }
+    try {
+        await checkUser();
+        await loadRecentActivity();
+    } catch (e) { console.warn('Supabase init skipped:', e); }
+};
+
+function showSection(sectionId) {
+    document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
+    const target = document.getElementById('section-' + sectionId);
+    if (target) target.classList.remove('hidden');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    const tab = document.getElementById('tab-' + sectionId);
+    if (tab) tab.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (sectionId === 'pageVillage') loadLeaderboard();
+}
+
+function initSectionReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section-fade').forEach(el => observer.observe(el));
+}
+
+function showLearnTab(tab) {
+    ['techniques', 'ranges', 'scales'].forEach(t => {
+        document.getElementById('learnContent-' + t)?.classList.add('hidden');
+        document.getElementById('learnTab-' + t)?.classList.remove('active');
+    });
+    document.getElementById('learnContent-' + tab)?.classList.remove('hidden');
+    document.getElementById('learnTab-' + tab)?.classList.add('active');
+}
+
+function toggleQA(item) {
+    const answer = item.querySelector('.qa-answer');
+    const indicator = item.querySelector('.qa-question span:last-child');
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.qa-answer').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.qa-question span:last-child').forEach(s => s.textContent = '+');
+    if (!isOpen) { answer.classList.add('open'); indicator.textContent = '−'; }
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    const identifyBtn = document.getElementById('modeIdentify');
+    const roastBtn = document.getElementById('modeRoast');
+    const title = document.getElementById('oracleTitle');
+    const subtitle = document.getElementById('oracleSubtitle');
+    if (mode === 'identify') {
+        identifyBtn.className = 'flex-1 btn btn-forest text-sm';
+        roastBtn.className = 'flex-1 btn btn-outline text-sm';
+        title.textContent = 'Snap It. Name It. Paint It Better.';
+        subtitle.textContent = 'Upload a photo of any miniature, figure, or scale model';
+    } else {
+        identifyBtn.className = 'flex-1 btn btn-outline text-sm';
+        roastBtn.className = 'flex-1 btn btn-forest text-sm';
+        title.textContent = 'Roast My Paintjob';
+        subtitle.textContent = 'Show us your work and prepare for honest feedback';
+    }
+}
+
+async function handleUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        await analyzeMiniature(e.target.result.split(',')[1], file);
+    };
+    reader.readAsDataURL(file);
+}
+
+async function analyzeMiniature(base64Image, file) {
+    document.getElementById('loadingView').classList.remove('hidden');
+    document.getElementById('resultView').classList.add('hidden');
+    startLoadingTimer();
+    try {
+        const response = await fetchWithRetry('/.netlify/functions/analyze-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image, mode: currentMode, oidType: 'miniature', userId: currentUser?.id })
+        });
+        const data = await response.json();
+        stopLoadingTimer();
+        currentResult = { title: data.title, description: data.description, image: file ? URL.createObjectURL(file) : null };
+        document.getElementById('resultTitle').textContent = data.title || 'Miniature Identified';
+        document.getElementById('resultDescription').textContent = data.description || 'Could not analyse this image.';
+        document.getElementById('loadingView').classList.add('hidden');
+        document.getElementById('resultView').classList.remove('hidden');
+        if (currentUser) { document.getElementById('signInPrompt').classList.add('hidden'); await awardKudos(2, 'miniature_scan'); }
+    } catch (error) {
+        console.error('Analysis error:', error);
+        stopLoadingTimer();
+        document.getElementById('loadingView').classList.add('hidden');
+        document.getElementById('resultView').classList.remove('hidden');
+        document.getElementById('resultTitle').textContent = 'Analysis Error';
+        document.getElementById('resultDescription').textContent = 'Something went wrong. Reg knocked his paint pot over. Please try again.';
+    }
+}
+
+function resetView() {
+    document.getElementById('resultView').classList.add('hidden');
+    document.getElementById('cameraInput').value = '';
+    document.getElementById('galleryInput').value = '';
+    currentResult = null;
+}
+
+function shareResult() {
+    if (!currentResult) return;
+    const text = `${currentResult.title}\n\n${(currentResult.description || '').substring(0, 200)}...\n\nIdentified by Miniature-Oid — miniature-oid.co.uk`;
+    if (navigator.share) { navigator.share({ title: 'Miniature Identified', text }).catch(() => {}); }
+    else { navigator.clipboard.writeText(text).then(() => alert('Copied!')).catch(() => {}); }
+}
+
+function downloadResult() {
+    if (!currentResult) return;
+    const canvas = document.getElementById('resultCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 800; canvas.height = 600;
+    ctx.fillStyle = '#0f1f14'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#2d6a4f'; ctx.fillRect(0, 0, canvas.width, 8); ctx.fillRect(0, canvas.height-8, canvas.width, 8);
+    ctx.fillStyle = '#e9c46a'; ctx.font = 'bold 32px Outfit, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('🔍 ' + (currentResult.title || 'Miniature-Oid'), canvas.width/2, 80);
+    ctx.fillStyle = '#f4f9f1'; ctx.font = '18px Outfit, sans-serif';
+    const words = (currentResult.description || '').split(' ');
+    let line = '', y = 130;
+    for (const word of words) {
+        const test = line + word + ' ';
+        if (ctx.measureText(test).width > 720 && line !== '') { ctx.fillText(line.trim(), canvas.width/2, y); line = word + ' '; y += 28; if (y > 520) { ctx.fillText('...', canvas.width/2, y); break; } }
+        else { line = test; }
+    }
+    if (y <= 520) ctx.fillText(line.trim(), canvas.width/2, y);
+    ctx.fillStyle = '#2d6a4f'; ctx.font = 'bold 22px Outfit, sans-serif';
+    ctx.fillText('miniature-oid.co.uk', canvas.width/2, canvas.height-30);
+    const link = document.createElement('a'); link.download = 'miniature-oid-result.png'; link.href = canvas.toDataURL(); link.click();
+}
+
+async function awardKudos(amount, reason) {
+    if (!currentUser) return;
+    try { await sb.rpc('increment_kudos', { user_id: currentUser.id, amount }); await sb.from('kudos_transactions').insert([{ user_id: currentUser.id, amount, reason }]); }
+    catch (e) { console.error('Kudos error:', e); }
+}
+
+function askRegQuick(question) { document.getElementById('regInput').value = question; askReg(); }
+
+async function askReg() {
+    const input = document.getElementById('regInput');
+    const question = input.value.trim();
+    if (!question) return;
+    input.value = '';
+    const chatEl = document.getElementById('chatMessages');
+    chatEl.innerHTML += `<div class="flex justify-end mb-3"><div class="chat-bubble chat-user">${escapeHtml(question)}</div></div>`;
+    const typingId = 'typing-' + Date.now();
+    chatEl.innerHTML += `<div id="${typingId}" class="flex items-start gap-2 mb-3"><span class="text-2xl flex-shrink-0">🔍</span><div class="chat-bubble chat-reg chat-typing"><span>.</span><span>.</span><span>.</span></div></div>`;
+    chatEl.scrollTop = chatEl.scrollHeight;
+    chatHistory.push({ role: 'user', text: question });
+    try {
+        const response = await fetch('/.netlify/functions/chat-reg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, history: chatHistory.slice(-6) }) });
+        const data = await response.json();
+        const answer = data.answer || "Lost my train of thought. Like a dropped brush rolling under the table. Ask me again?";
+        chatHistory.push({ role: 'model', text: answer });
+        document.getElementById(typingId)?.remove();
+        chatEl.innerHTML += `<div class="flex items-start gap-2 mb-3"><span class="text-2xl flex-shrink-0">🔍</span><div class="chat-bubble chat-reg">${escapeHtml(answer)}</div></div>`;
+        chatEl.scrollTop = chatEl.scrollHeight;
+    } catch (error) {
+        document.getElementById(typingId)?.remove();
+        chatEl.innerHTML += `<div class="flex items-start gap-2 mb-3"><span class="text-2xl flex-shrink-0">🔍</span><div class="chat-bubble chat-reg">Something's gone wrong. Like varnish on a cold day. Try again in a moment.</div></div>`;
+        chatEl.scrollTop = chatEl.scrollHeight;
+    }
+}
+
+function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML.replace(/\n/g, '<br>'); }
+
+function signInWithPatreon() { window.location.href = PATREON_OAUTH_URL; }
+
+function restorePatreonSession() {
+    try {
+        const raw = localStorage.getItem('miniatureoid_patreon_session');
+        if (!raw) return;
+        const stored = JSON.parse(raw);
+        if (Date.now() > stored.expiresAt) { localStorage.removeItem('miniatureoid_patreon_session'); return; }
+        patreonSession = stored; showPatreonStatus();
+    } catch (e) { console.warn('restorePatreonSession:', e); }
+}
+
+async function handlePatreonCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (!code) return;
+    try {
+        const res = await fetch(`/.netlify/functions/patreon-auth?code=${encodeURIComponent(code)}`);
+        if (!res.ok) throw new Error('auth failed');
+        const data = await res.json();
+        const session = { isPro: data.isPro, tier: data.tier, expiresAt: Date.now() + 86400000 };
+        localStorage.setItem('miniatureoid_patreon_session', JSON.stringify(session));
+        patreonSession = session; showPatreonStatus();
+        window.history.replaceState({}, '', '/');
+    } catch (e) { console.warn('handlePatreonCallback:', e); }
+}
+
+function showPatreonStatus() {
+    if (!patreonSession) return;
+    ['patreonStatus', 'patreonStatusReg', 'patreonStatusVillage'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.remove('hidden'); el.innerHTML = patreonSession.isPro ? `<span class="text-green-600 font-bold">✓ Patreon ${patreonSession.tier || 'member'} — Pro unlocked</span>` : `<span class="text-gray-600">Signed in — <a href="https://www.patreon.com/chrisptee" target="_blank" class="text-forest font-semibold">upgrade for Pro</a></span>`; }
+    });
+    ['patreonSignInBtn', 'patreonSignInBtnReg', 'patreonSignInBtnVillage'].forEach(id => { document.getElementById(id)?.classList.add('hidden'); });
+    if (patreonSession.isPro) { document.getElementById('signInPrompt')?.classList.add('hidden'); document.getElementById('villageSignIn')?.classList.add('hidden'); }
+}
+
+async function signOut() { await sb.auth.signOut(); currentUser = null; localStorage.removeItem('miniatureoid_patreon_session'); location.reload(); }
+
+function getYouTubeEmbedUrl(url) {
+    if (!url) return '';
+    let videoId = '';
+    if (url.includes('youtube.com/shorts/')) videoId = url.split('youtube.com/shorts/')[1].split('?')[0];
+    else if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
+    else if (url.includes('youtube.com/watch')) videoId = new URLSearchParams(url.split('?')[1]).get('v');
+    else if (url.includes('youtube.com/embed/')) videoId = url.split('youtube.com/embed/')[1].split('?')[0];
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+}
+
+async function loadBroadcast() {
+    try { const { data } = await sb.from('broadcast').select('*').eq('is_active', true).limit(1).single(); if (!data) return; document.getElementById('broadcastVideo').src = getYouTubeEmbedUrl(data.video_url); document.getElementById('broadcastTitle').textContent = data.title || 'Village Broadcast'; document.getElementById('broadcastSection').classList.remove('hidden'); if (data.is_emergency) document.getElementById('emergencyBanner').classList.remove('hidden'); }
+    catch (e) { console.log('Broadcast not available'); }
+}
+
+async function checkUser() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) { currentUser = session.user; await loadUserData(); showUserStatus(); }
+}
+
+async function loadUserData() {
+    if (!currentUser) return;
+    try {
+        let { data: userData, error } = await sb.from('users').select('*').eq('id', currentUser.id).single();
+        if (error || !userData) {
+            const { data: newUser } = await sb.from('users').insert([{ id: currentUser.id, email: currentUser.email, username: currentUser.email.split('@')[0], kudos: 0, oid_memberships: [CONFIG.oidSlug] }]).select().single();
+            userData = newUser;
+        } else if (!userData.oid_memberships.includes(CONFIG.oidSlug)) {
+            await sb.from('users').update({ oid_memberships: [...userData.oid_memberships, CONFIG.oidSlug] }).eq('id', currentUser.id);
+        }
+        const oidCount = userData.oid_memberships.length;
+        let badge = 'Villager';
+        if (oidCount >= 5) badge = 'Pollinator';
+        else if (oidCount >= 2) badge = 'Bridge Walker';
+        document.getElementById('userName').textContent = '@' + userData.username;
+        document.getElementById('userKudos').textContent = userData.kudos || 0;
+        document.getElementById('userBadge').textContent = badge;
+    } catch (error) { console.error('Error loading user data:', error); }
+}
+
+function showUserStatus() { document.getElementById('userBar').classList.remove('hidden'); document.getElementById('signInPrompt')?.classList.add('hidden'); document.getElementById('villageSignIn')?.classList.add('hidden'); }
+
+async function loadRecentActivity() {
+    try {
+        const { data } = await sb.from('users').select('username, created_at').order('created_at', { ascending: false }).limit(5);
+        document.getElementById('activityList').innerHTML = data && data.length > 0 ? data.map(u => `<p>${CONFIG.loadingIcon} <strong>${u.username}</strong> joined the village!</p>`).join('') : '<p class="text-center text-gray-400">Be the first to join!</p>';
+    } catch (e) { console.error('Activity error:', e); }
+}
+
+async function loadLeaderboard() {
+    try {
+        const { data } = await sb.from('users').select('username, kudos, oid_memberships').order('kudos', { ascending: false }).limit(10);
+        if (data) {
+            document.getElementById('leaderboardList').innerHTML = data.map((u, i) => {
+                const oidCount = u.oid_memberships.length;
+                let badge = 'Villager'; if (oidCount >= 5) badge = 'Pollinator'; else if (oidCount >= 2) badge = 'Bridge Walker';
+                return `<div class="flex items-center justify-between bg-cream p-4 rounded-xl"><div class="flex items-center gap-3"><span class="text-xl font-bold text-forest">#${i+1}</span><span class="text-sm">${badge}</span><span class="font-bold">@${u.username}</span></div><span class="text-forest font-bold">${u.kudos} Kudos</span></div>`;
+            }).join('');
+        }
+    } catch (e) { console.error('Leaderboard error:', e); }
+}
+
+function startLoadingTimer() {
+    loadingStartTime = Date.now();
+    const timerEl = document.getElementById('loadingTimer');
+    const msgEl = document.getElementById('loadingMessage');
+    let msgIdx = 0;
+    loadingTimerInterval = setInterval(() => { const e = Math.floor((Date.now()-loadingStartTime)/1000); if (timerEl) timerEl.textContent = `${Math.floor(e/60)}:${(e%60).toString().padStart(2,'0')}`; }, 1000);
+    if (msgEl) msgEl.textContent = patienceMessages[0];
+    messageRotationInterval = setInterval(() => { msgIdx = (msgIdx+1) % patienceMessages.length; if (msgEl) msgEl.textContent = patienceMessages[msgIdx]; }, 3000);
+}
+
+function stopLoadingTimer() {
+    if (loadingTimerInterval) { clearInterval(loadingTimerInterval); loadingTimerInterval = null; }
+    if (messageRotationInterval) { clearInterval(messageRotationInterval); messageRotationInterval = null; }
+    const timerEl = document.getElementById('loadingTimer'); if (timerEl) timerEl.textContent = '';
+}
+
+async function fetchWithRetry(url, options, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try { const r = await fetch(url, options); if (r.ok) return r; if (r.status === 503 && i < maxRetries-1) { await new Promise(res => setTimeout(res, 2000*(i+1))); continue; } return r; }
+        catch (e) { if (i < maxRetries-1) await new Promise(res => setTimeout(res, 2000)); else throw e; }
+    }
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const refCode = urlParams.get('ref');
+if (refCode) localStorage.setItem('referredBy', refCode);
+
+async function meetGetLocation(label) {
+    meetCurrentLabel = label;
+    const card = document.getElementById('meetLocationCard');
+    const w3wEl = document.getElementById('meetW3W');
+    const coordsEl = document.getElementById('meetCoordsDisplay');
+    const labelEl = document.getElementById('meetLabelDisplay');
+    if (card) card.classList.remove('hidden');
+    if (labelEl) labelEl.textContent = label + ':';
+    if (w3wEl) { w3wEl.textContent = 'Finding location…'; }
+    if (coordsEl) coordsEl.textContent = '';
+    if (!navigator.geolocation) { if (w3wEl) w3wEl.textContent = 'Geolocation not available'; return; }
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        if (coordsEl) coordsEl.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        try {
+            const res = await fetch(`https://api.what3words.com/v3/convert-to-3wa?coordinates=${lat},${lng}&language=en&format=json&key=${W3W_API_KEY}`);
+            const data = await res.json();
+            if (data.words) {
+                meetCurrentW3W = data.words;
+                if (w3wEl) w3wEl.textContent = '///' + data.words;
+                document.getElementById('meetMapLink').href = `https://what3words.com/${data.words}`;
+                document.getElementById('meetQrCard')?.classList.remove('hidden');
+                meetGenerateQR();
+            } else { if (w3wEl) w3wEl.textContent = 'Could not get address'; }
+        } catch (e) { if (w3wEl) w3wEl.textContent = 'Network error — try again'; }
+    }, () => { if (w3wEl) w3wEl.textContent = 'Location denied — use manual entry below'; }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+function meetCopy() {
+    if (!meetCurrentW3W) return;
+    const text = `${meetCurrentLabel}: ///${meetCurrentW3W} — https://what3words.com/${meetCurrentW3W}`;
+    navigator.clipboard.writeText(text).then(() => alert('Copied!')).catch(() => alert(text));
+}
+
+function meetShare() {
+    if (!meetCurrentW3W) return;
+    const text = `${meetCurrentLabel}: ///${meetCurrentW3W} — https://what3words.com/${meetCurrentW3W}`;
+    if (navigator.share) { navigator.share({ title: 'Meet me here', text, url: `https://what3words.com/${meetCurrentW3W}` }).catch(() => {}); }
+    else { navigator.clipboard.writeText(text).then(() => alert('Link copied!')).catch(() => alert(text)); }
+}
+
+function meetGenerateQR() {
+    if (!meetCurrentW3W) return;
+    const canvas = document.getElementById('meetQrCanvas');
+    if (!canvas) return;
+    QRCode.toCanvas(canvas, `https://what3words.com/${meetCurrentW3W}`, { width: 220, color: { dark: '#2d6a4f', light: '#f4f9f1' } }, (err) => { if (err) console.warn('QR error:', err); });
+}
+
+function meetDownloadQR() {
+    const canvas = document.getElementById('meetQrCanvas'); if (!canvas) return;
+    const link = document.createElement('a'); link.download = `miniature-oid-meet-${meetCurrentW3W||'location'}.png`; link.href = canvas.toDataURL(); link.click();
+}
+
+function meetAutoSuggest(value) {
+    clearTimeout(meetAutoSuggestTimer);
+    const list = document.getElementById('meetSuggestList');
+    if (!value || value.length < 3) { if (list) list.classList.add('hidden'); return; }
+    meetAutoSuggestTimer = setTimeout(async () => {
+        try {
+            const res = await fetch(`https://api.what3words.com/v3/autosuggest?input=${encodeURIComponent(value)}&key=${W3W_API_KEY}`);
+            const data = await res.json();
+            if (!list) return;
+            if (data.suggestions && data.suggestions.length > 0) {
+                list.innerHTML = data.suggestions.slice(0,5).map(s => `<div onclick="meetSelectSuggestion('${s.words}')" class="px-4 py-3 cursor-pointer hover:bg-green-50 border-b last:border-0 font-semibold" style="color:#0f1f14; min-height:44px; display:flex; align-items:center;">///${s.words}</div>`).join('');
+                list.classList.remove('hidden');
+            } else { list.classList.add('hidden'); }
+        } catch (e) { if (list) list.classList.add('hidden'); }
+    }, 300);
+}
+
+function meetSelectSuggestion(words) {
+    document.getElementById('meetManualInput').value = words;
+    document.getElementById('meetSuggestList')?.classList.add('hidden');
+    meetLookup();
+}
+
+async function meetLookup() {
+    const input = document.getElementById('meetManualInput').value.trim().replace(/^\/\/\//, '');
+    const statusEl = document.getElementById('meetManualStatus');
+    if (!input || input.split('.').length !== 3) { if (statusEl) { statusEl.textContent = 'Enter three words separated by dots'; statusEl.classList.remove('hidden'); } return; }
+    if (statusEl) { statusEl.textContent = 'Looking up...'; statusEl.classList.remove('hidden'); }
+    try {
+        const res = await fetch(`https://api.what3words.com/v3/convert-to-coordinates?words=${encodeURIComponent(input)}&key=${W3W_API_KEY}`);
+        const data = await res.json();
+        if (data.coordinates) {
+            meetCurrentW3W = data.words;
+            document.getElementById('meetLocationCard')?.classList.remove('hidden');
+            const w3wEl = document.getElementById('meetW3W'); if (w3wEl) w3wEl.textContent = '///' + data.words;
+            const coordsEl = document.getElementById('meetCoordsDisplay'); if (coordsEl) coordsEl.textContent = `${data.coordinates.lat.toFixed(5)}, ${data.coordinates.lng.toFixed(5)}`;
+            const labelEl = document.getElementById('meetLabelDisplay'); if (labelEl) labelEl.textContent = 'Location:';
+            document.getElementById('meetMapLink').href = `https://what3words.com/${data.words}`;
+            document.getElementById('meetQrCard')?.classList.remove('hidden');
+            meetGenerateQR();
+            if (statusEl) statusEl.classList.add('hidden');
+        } else { if (statusEl) { statusEl.textContent = 'Address not found. Check spelling.'; statusEl.classList.remove('hidden'); } }
+    } catch (e) { if (statusEl) { statusEl.textContent = 'Network error. Try again.'; statusEl.classList.remove('hidden'); } }
+}
+</script>
+</body>
+</html>

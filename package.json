@@ -1,0 +1,11 @@
+{
+  "name": "miniature-oid",
+  "version": "1.0.0",
+  "description": "Dollhouse & Miniature AI - Part of FeelFamous Ecosystem",
+  "main": "index.html",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "author": "Chris P Tee",
+  "license": "MIT"
+}
