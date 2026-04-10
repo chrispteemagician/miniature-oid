@@ -105,7 +105,7 @@
 
 <!-- ==================== HEADER ==================== -->
 <header class="header-gradient text-center py-10 px-4">
-    <div class="text-7xl mb-4">🔍</div>
+    <div class="text-7xl mb-4" onclick="handleLogoTap()" style="cursor:pointer">🔍</div>
     <h1 class="text-5xl sm:text-6xl font-extrabold text-cream mb-2">Miniature-Oid</h1>
     <p class="text-xl font-bold text-gold mb-1">THE PAINTING TABLE</p>
     <p class="font-handwritten text-2xl text-cream opacity-80">"Every detail tells a story"</p>
@@ -114,7 +114,7 @@
 <!-- Free-to-use banner -->
 <div style="background: linear-gradient(135deg, #2d6a4f, #1e4d38);" class="text-center py-3 px-4">
     <p class="text-sm font-semibold text-cream">
-        Free to use, forever. Join the <a href="https://feelfamous.com" class="underline font-bold">FeelFamous Family</a> to unlock
+        Free to use, forever. Join the <a href="https://feelfamous.co.uk" class="underline font-bold">FeelFamous Family</a> to unlock
         <span class="bg-yellow-300 text-black px-2 py-0.5 rounded font-bold text-xs">PRO</span> features across ALL -Oid Apps.
     </p>
 </div>
@@ -122,7 +122,7 @@
 <!-- Action buttons -->
 <div class="bg-cream py-4 px-4">
     <div class="max-w-2xl mx-auto flex flex-wrap gap-3 justify-center">
-        <a href="https://feelfamous.com/founders.html" class="btn btn-dark text-sm">Join The Village</a>
+        <a href="https://feelfamous.co.uk/founders.html" class="btn btn-dark text-sm">Join The Village</a>
         <a href="mailto:chris@chrisptee.co.uk" class="btn text-sm" style="background:#3b82f6;color:white">Email</a>
         <a href="https://wa.me/447976884254" class="btn text-sm" style="background:#16a34a;color:white">WhatsApp</a>
         <a href="https://www.patreon.com/chrisptee" target="_blank" class="btn btn-gold text-sm">Join on Patreon</a>
@@ -149,6 +149,7 @@
         <button onclick="showSection('pageVillage')" class="nav-tab" id="tab-pageVillage">🏘️ Village</button>
     </div>
 </div>
+<div id="godModeIndicator" class="hidden text-center py-1 text-xs font-bold tracking-widest" style="background:#1a3320;color:#ffd700;">⚡ GOD MODE ACTIVE</div>
 
 <!-- ==================== MAIN CONTENT ==================== -->
 <main class="max-w-2xl mx-auto px-4 py-6">
@@ -213,7 +214,7 @@
             <button onclick="downloadResult()" class="btn btn-dark flex-1" style="min-height:48px;">Save</button>
             <button onclick="resetView()" class="btn btn-outline flex-1" style="min-height:48px;">New Scan</button>
         </div>
-        <div id="signInPrompt" class="mt-4 p-4 rounded-2xl text-center" style="background: #eef5e8; border: 2px solid #d8e8d0;">
+        <div id="signInPrompt" class="hidden mt-4 p-4 rounded-2xl text-center" style="background: #eef5e8; border: 2px solid #d8e8d0;">
             <p class="text-sm font-semibold mb-3">Sign in to save results, earn Kudos, and join the village</p>
             <div id="patreonStatus" class="hidden mb-3 text-sm"></div>
             <button id="patreonSignInBtn" onclick="signInWithPatreon()" class="btn btn-forest w-full text-sm">Sign in with Patreon</button>
@@ -647,7 +648,7 @@
     <div class="card" style="background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%); color: white; border-radius: 20px;">
         <h3 class="text-xl font-bold mb-2">Noisy Brain?</h3>
         <p class="text-sm opacity-90 mb-3">Miniature painting is one of the best hobbies for ADHD and autism. The hyper-focus, the detail work, the meditative rhythm of base-wash-drybrush — it was practically designed for us. You're in very good company here.</p>
-        <a href="https://feelfamous.com" target="_blank" rel="noopener" class="btn w-full" style="background:white;color:#4338ca;font-weight:700;">FeelFamous Community</a>
+        <a href="https://feelfamous.co.uk" target="_blank" rel="noopener" class="btn w-full" style="background:white;color:#4338ca;font-weight:700;">FeelFamous Community</a>
     </div>
 
 </div>
@@ -656,7 +657,7 @@
 
 <footer class="text-center py-8 px-4 text-sm" style="background: #0f1f14; color: #e9c46a;">
     <p class="mb-1 font-bold">Miniature-Oid — The Painting Table</p>
-    <p class="text-xs opacity-70">Part of the <a href="https://feelfamous.com" class="underline">FeelFamous</a> village ecosystem</p>
+    <p class="text-xs opacity-70">Part of the <a href="https://feelfamous.co.uk" class="underline">FeelFamous</a> village ecosystem</p>
     <p class="text-xs opacity-50 mt-2">miniature-oid.co.uk</p>
 </footer>
 
@@ -714,6 +715,7 @@ const patienceMessages = [
 ];
 
 window.onload = async function() {
+    checkStoredGodMode();
     initSectionReveal();
     loadBroadcast();
     restorePatreonSession();
@@ -1116,6 +1118,32 @@ async function meetLookup() {
             if (statusEl) statusEl.classList.add('hidden');
         } else { if (statusEl) { statusEl.textContent = 'Address not found. Check spelling.'; statusEl.classList.remove('hidden'); } }
     } catch (e) { if (statusEl) { statusEl.textContent = 'Network error. Try again.'; statusEl.classList.remove('hidden'); } }
+}
+
+// ===== GOD MODE =====
+let isAdmin = false;
+let logoTapCount = 0, logoTapTimer = null;
+function handleLogoTap() {
+    logoTapCount++;
+    clearTimeout(logoTapTimer);
+    logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 800);
+    if (logoTapCount >= 3) {
+        logoTapCount = 0;
+        if (isAdmin) { alert('God Mode already active ✓'); return; }
+        const input = prompt('Enter passcode:');
+        if (input === 'Z0d14cM4nTr1n1tyxx') {
+            localStorage.setItem('miniature_oid_god_mode', '1');
+            activateGodMode();
+            alert('God Mode activated 🔥');
+        }
+    }
+}
+function activateGodMode() {
+    isAdmin = true;
+    document.getElementById('godModeIndicator')?.classList.remove('hidden');
+}
+function checkStoredGodMode() {
+    if (localStorage.getItem('miniature_oid_god_mode') === '1') activateGodMode();
 }
 </script>
 </body>
