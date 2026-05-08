@@ -1,0 +1,13 @@
+# miniature-oid
+
+> Free AI tool for miniature and wargaming collectors. Identify figures, sets, and paint schemes.
+
+## Pages
+
+- [Home](https://miniature-oid.co.uk/): Home — AI miniature and wargaming figure identifier
+
+## About
+
+Part of the FeelFamous ecosystem — free AI tools for specialists, collectors, and personal sellers.
+Built by Chris P Taylor (Doc Strange). PLUR. World domination through kindness. One ember at a time.
+Contact: chris@chrisptee.com
