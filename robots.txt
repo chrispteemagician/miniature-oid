@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://miniature-oid.co.uk/sitemap.xml
