@@ -195,7 +195,7 @@ Format as JSON:
               { text: systemPrompt },
               {
                 inline_data: {
-                  mime_type: "image/jpeg",
+                  mime_type: (image.match(/^data:(image\/\w+);base64,/) || [])[1] || 'image/jpeg',
                   data: image.replace(/^data:image\/\w+;base64,/, '')
                 }
               }
