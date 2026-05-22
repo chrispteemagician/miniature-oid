@@ -87,11 +87,11 @@ Be Reg. Be straight. Be the experienced hand across the table that beginners des
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Referer': 'https://feelfamous.co.uk/' },
+        headers: { 'Content-Type': 'application/json', 'Referer': 'https://www.feelfamous.co.uk/' },
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: contents,
-          generationConfig: { temperature: 0.8, topK: 40, topP: 0.95, maxOutputTokens: 1024 }
+          generationConfig: { temperature: 0.8, topK: 40, topP: 0.95, maxOutputTokens: 2048 }
         })
       }
     );
