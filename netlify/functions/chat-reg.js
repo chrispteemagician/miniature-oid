@@ -1,4 +1,4 @@
-// Ask Reg — Miniature-Oid Chatbot
+﻿// Ask Reg — Miniature-Oid Chatbot
 // Been painting since 1978. First Airfix kit at 8. Seen every trend come and go.
 
 exports.handler = async (event) => {
@@ -87,7 +87,7 @@ Be Reg. Be straight. Be the experienced hand across the table that beginners des
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Referer': 'https://feelfamous.co.uk/' },
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: contents,
