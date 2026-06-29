@@ -99,9 +99,97 @@
             .card { padding: 20px; }
             .nav-tab { font-size: 12px; padding: 12px 4px; }
         }
+    
+        /* MARY JANE BERLIN BANNER */
+        .mjb-banner {
+            background: linear-gradient(90deg, #b87a00 0%, #e05a00 100%);
+            color: #fff;
+            text-align: center;
+            padding: .7rem 1rem;
+            font-size: clamp(.8rem, 2vw, 1rem);
+            font-weight: 700;
+            line-height: 1.4;
+            position: relative;
+            z-index: 199;
+        }
+        .mjb-banner a {
+            color: #fff;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .mjb-banner a:hover { opacity: .85; }
+    
+        /* FOUNDING MEMBER BANNER */
+        .founding-banner {
+            background: #1c1917;
+            color: #fff;
+            text-align: center;
+            padding: .6rem 1rem;
+            font-size: clamp(.78rem, 1.8vw, .92rem);
+            font-weight: 600;
+            line-height: 1.5;
+            position: relative;
+            z-index: 198;
+        }
+        .founding-banner strong { color: #fb923c; }
+        .founding-banner a {
+            color: #fb923c;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .founding-banner a:hover { opacity: .8; }
+    
+        /* BUG REPORT WIDGET */
+        .bug-btn {
+            position: fixed; bottom: 18px; right: 18px; z-index: 9999;
+            background: #1c1917; color: #fff; border: none; border-radius: 20px;
+            padding: 8px 14px; font-size: .78rem; font-weight: 700;
+            cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.3);
+            display: flex; align-items: center; gap: 6px; font-family: inherit;
+            opacity: .7; transition: opacity .2s;
+        }
+        .bug-btn:hover { opacity: 1; }
+        .bug-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+            z-index: 10000; align-items: center; justify-content: center; padding: 16px;
+        }
+        .bug-modal-overlay.open { display: flex; }
+        .bug-modal {
+            background: #fff; border-radius: 16px; padding: 24px;
+            max-width: 380px; width: 100%; font-family: inherit;
+        }
+        .bug-modal h3 { margin: 0 0 4px; font-size: 1rem; color: #1c1917; }
+        .bug-modal p { margin: 0 0 14px; font-size: .8rem; color: #78716c; }
+        .bug-modal label { display: block; font-size: .8rem; font-weight: 700; color: #1c1917; margin-bottom: 4px; }
+        .bug-modal input, .bug-modal textarea {
+            width: 100%; border: 1.5px solid #e7e5e4; border-radius: 8px;
+            padding: 8px 10px; font-size: .85rem; font-family: inherit;
+            margin-bottom: 12px; box-sizing: border-box; resize: vertical;
+        }
+        .bug-modal input:focus, .bug-modal textarea:focus { outline: none; border-color: #fb923c; }
+        .bug-modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+        .bug-cancel { background: none; border: 1.5px solid #e7e5e4; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: .85rem; font-family: inherit; }
+        .bug-submit { background: #1c1917; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: .85rem; font-weight: 700; font-family: inherit; }
+        .bug-submit:disabled { opacity: .5; cursor: not-allowed; }
+        .bug-success { color: #16a34a; font-size: .85rem; text-align: center; margin-top: 8px; }
     </style>
 </head>
 <body>
+
+<!-- FOUNDING MEMBER BANNER -->
+<div class="founding-banner">
+    🏡 It&#39;s free to use. <strong>£4.95/month keeps the bots out.</strong> Founding Member price — first 1,000 only. After that, the door goes up.&nbsp;
+    <a href="https://www.patreon.com/chrisptee" target="_blank" rel="noopener noreferrer">Join the village →</a>
+</div>
+
+
+<!-- MARY JANE BERLIN BANNER -->
+<div class="mjb-banner">
+    🌿 <strong>Doc Strange / Chris P Tee</strong> — Prescribed MC Patient &amp; Legal Cannabis Advocate — See me at <strong>Mary Jane Berlin, June 11–14</strong>. Built this for people like me.&nbsp;
+    <a href="https://cannabin-oid.co.uk">Visit cannabin-oid.co.uk →</a>
+</div>
+
 
 <!-- ==================== HEADER ==================== -->
 <header class="header-gradient text-center py-10 px-4">
@@ -114,7 +202,7 @@
 <!-- Free-to-use banner -->
 <div style="background: linear-gradient(135deg, #2d6a4f, #1e4d38);" class="text-center py-3 px-4">
     <p class="text-sm font-semibold text-cream">
-        <strong>Free to use.</strong> Sign in to join the village — from <strong>£3/month on Patreon</strong>. <a href="https://feelfamous.co.uk" class="underline font-bold">feelfamous.co.uk</a>
+        <strong>Free to use.</strong> Sign in to join the village — from <strong>£4.95/month on Patreon</strong>. <a href="https://feelfamous.co.uk" class="underline font-bold">feelfamous.co.uk</a>
     </p>
 </div>
 
@@ -606,7 +694,7 @@
             <div class="border-2 border-gray-200 rounded-2xl p-5">
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="font-bold">🏡 Villager</h4>
-                    <span class="font-bold" style="color:#2d6a4f;">£3/month</span>
+                    <span class="font-bold" style="color:#2d6a4f;">£4.95/month</span>
                 </div>
                 <ul class="text-sm text-gray-600 space-y-1 mb-2">
                     <li>✓ Your hut in the village</li>
@@ -619,7 +707,7 @@
             <div class="border-2 rounded-2xl p-5" style="border-color: #2d6a4f; background: linear-gradient(135deg, #f4f9f1, #eef5e8);">
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="font-bold">⭐ Elder</h4>
-                    <span class="font-bold" style="color:#2d6a4f;">£7/month</span>
+                    <span class="font-bold" style="color:#2d6a4f;">Earned</span>
                 </div>
                 <ul class="text-sm text-gray-600 space-y-1 mb-2">
                     <li>✓ Everything in Villager</li>
@@ -627,12 +715,12 @@
                     <li>✓ Named in the village roll</li>
                     <li>✓ Elder badge site-wide</li>
                 </ul>
-                <p class="text-xs text-gray-400">Cancel anytime.</p>
+                <p class="text-xs text-gray-600">You don't buy Elder. You become it — by staying and being part of why the village is good.</p>
             </div>
             <div class="border-2 rounded-2xl p-5" style="border-color: #e9c46a; background: linear-gradient(135deg, #fffbf0, #fff8e8);">
                 <div class="flex justify-between items-center mb-1">
                     <h4 class="font-bold">👑 Founder</h4>
-                    <span class="font-bold" style="color:#b8860b;">£15/month</span>
+                    <span class="font-bold" style="color:#b8860b;">£14.95/month</span>
                 </div>
                 <p class="text-xs font-bold mb-2" style="color:#b8860b;">Best Value</p>
                 <ul class="text-sm text-gray-600 space-y-1 mb-2">
@@ -1191,6 +1279,41 @@ function activateGodMode() {
 }
 function checkStoredGodMode() {
     if (localStorage.getItem('miniature_oid_god_mode') === '1') activateGodMode();
+}
+</script>
+
+<!-- BUG REPORT WIDGET -->
+<button class="bug-btn" onclick="document.getElementById('bugModal').classList.add('open')">🐛 Found a bug?</button>
+<div class="bug-modal-overlay" id="bugModal">
+  <div class="bug-modal">
+    <h3>🐛 Report a broken page</h3>
+    <p>Found something broken? Tell us. If we didn't know about it, you get a free month of Villager.</p>
+    <label>What's broken?</label>
+    <textarea id="bugDesc" rows="3" placeholder="Describe what's not working..."></textarea>
+    <label>Your email <span style="font-weight:400;color:#a8a29e">(optional — needed for your free month)</span></label>
+    <input type="email" id="bugEmail" placeholder="you@example.com">
+    <div class="bug-modal-footer">
+      <button class="bug-cancel" onclick="document.getElementById('bugModal').classList.remove('open')">Cancel</button>
+      <button class="bug-submit" id="bugSubmitBtn" onclick="submitBugReport()">Send report</button>
+    </div>
+    <div class="bug-success hidden" id="bugSuccess">Thanks! We'll check it out. 🙌</div>
+  </div>
+</div>
+<script>
+async function submitBugReport() {
+  const desc = document.getElementById('bugDesc').value.trim();
+  if (!desc) return;
+  const btn = document.getElementById('bugSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    await fetch('https://www.spicylister.com/.netlify/functions/bug-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: window.location.href, description: desc, email: document.getElementById('bugEmail').value.trim() || null })
+    });
+    document.getElementById('bugSuccess').classList.remove('hidden');
+    setTimeout(() => document.getElementById('bugModal').classList.remove('open'), 2000);
+  } catch(e) { btn.disabled = false; btn.textContent = 'Send report'; }
 }
 </script>
 </body>
