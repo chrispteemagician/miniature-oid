@@ -8,8 +8,8 @@
     <meta name="theme-color" content="#2d6a4f">
     <meta property="og:title" content="Miniature-Oid | The Painting Table">
     <meta property="og:description" content="AI miniature expert in your pocket. Identify figures, get painting advice, and find your community. Free forever.">
-    <meta property="og:image" content="https://miniature-oid.co.uk/miniature-oid.jpg">
-    <meta property="og:url" content="https://miniature-oid.co.uk">
+    <meta property="og:image" content="https://miniature-oid.netlify.app/miniature-oid.jpg">
+    <meta property="og:url" content="https://miniature-oid.netlify.app">
     <link rel="icon" type="image/jpeg" href="miniature-oid.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -773,7 +773,7 @@
 <footer class="text-center py-8 px-4 text-sm" style="background: #0f1f14; color: #e9c46a;">
     <p class="mb-1 font-bold">Miniature-Oid — The Painting Table</p>
     <p class="text-xs opacity-70">Part of the <a href="https://feelfamous.co.uk" class="underline">FeelFamous</a> village ecosystem</p>
-    <p class="text-xs opacity-50 mt-2">miniature-oid.co.uk</p>
+    <p class="text-xs opacity-50 mt-2">miniature-oid.netlify.app</p>
 
     <!-- FeelFamous Village Hub -->
     <div style="background:#0f172a;border-top:2px solid rgba(251,191,36,0.25);padding:1rem 1.5rem;text-align:center;">
@@ -800,7 +800,7 @@ const CONFIG = {
 };
 
 const PATREON_CLIENT_ID = 'A-K7cVCZBl7mQZDlrq0obIq7Jm0RPYAMGstfBsUyEeX-5e6WvU24ZWMTGBuypxot';
-const PATREON_OAUTH_URL = `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${PATREON_CLIENT_ID}&redirect_uri=https://miniature-oid.co.uk/auth/patreon&scope=identity%20identity.memberships`;
+const PATREON_OAUTH_URL = `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${PATREON_CLIENT_ID}&redirect_uri=https://miniature-oid.netlify.app/auth/patreon&scope=identity%20identity.memberships`;
 const W3W_API_KEY = 'R7VL7Q93';
 
 let patreonSession = null;
@@ -953,7 +953,7 @@ function resetView() {
 
 function shareResult() {
     if (!currentResult) return;
-    const text = `${currentResult.title}\n\n${(currentResult.description || '').substring(0, 200)}...\n\nIdentified by Miniature-Oid — miniature-oid.co.uk`;
+    const text = `${currentResult.title}\n\n${(currentResult.description || '').substring(0, 200)}...\n\nIdentified by Miniature-Oid — miniature-oid.netlify.app`;
     if (navigator.share) { navigator.share({ title: 'Miniature Identified', text }).catch(() => {}); }
     else { navigator.clipboard.writeText(text).then(() => alert('Copied!')).catch(() => {}); }
 }
@@ -977,7 +977,7 @@ function downloadResult() {
     }
     if (y <= 520) ctx.fillText(line.trim(), canvas.width/2, y);
     ctx.fillStyle = '#2d6a4f'; ctx.font = 'bold 22px Outfit, sans-serif';
-    ctx.fillText('miniature-oid.co.uk', canvas.width/2, canvas.height-30);
+    ctx.fillText('miniature-oid.netlify.app', canvas.width/2, canvas.height-30);
     const link = document.createElement('a'); link.download = 'miniature-oid-result.png'; link.href = canvas.toDataURL(); link.click();
 }
 
