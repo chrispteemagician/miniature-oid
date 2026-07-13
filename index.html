@@ -179,7 +179,7 @@
 
 <!-- FOUNDING MEMBER BANNER -->
 <div class="founding-banner">
-    🏡 It&#39;s free to use. <strong>£4.95/month keeps the bots out.</strong> Founding Member price — first 1,000 only. After that, the door goes up.&nbsp;
+    🏡 It&#39;s free to use, always will be. <strong>£4.95/month</strong> keeps the village running — hut pages, Kudos, the works.&nbsp;
     <a href="https://www.patreon.com/chrisptee" target="_blank" rel="noopener noreferrer">Join the village →</a>
 </div>
 
@@ -300,6 +300,14 @@
             <button onclick="shareResult()" class="btn btn-forest flex-1" style="min-height:48px;">Share</button>
             <button onclick="downloadResult()" class="btn btn-dark flex-1" style="min-height:48px;">Save</button>
             <button onclick="resetView()" class="btn btn-outline flex-1" style="min-height:48px;">New Scan</button>
+        </div>
+        <div id="honestyBox" class="mt-4 p-4 rounded-2xl text-center" style="background: #eef5e8; border: 1px solid #d8e8d0;">
+            <p class="text-sm text-gray-600 leading-relaxed">
+                This is free, always will be — that's not changing. It saved you time just now, and it costs real money to keep running. Tell a mate who'd use it too, or pay it forward some other way. That's genuinely enough.
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+                If you'd rather say thanks with money: a one-off <a href="https://buymeacoffee.com/chrispteemagician" target="_blank" rel="noopener noreferrer" class="text-forest font-bold underline">buy me a coffee</a> covers it, or <a href="https://www.patreon.com/chrisptee" target="_blank" rel="noopener noreferrer" class="text-forest font-bold underline">Patreon</a> if you want to be a regular. Either way, nothing here was ever locked behind it.
+            </p>
         </div>
         <div id="signInPrompt" class="hidden mt-4 p-4 rounded-2xl text-center" style="background: #eef5e8; border: 2px solid #d8e8d0;">
             <p class="text-sm font-semibold mb-3">Sign in to save results, earn Kudos, and join the village</p>
@@ -1060,10 +1068,10 @@ function showPatreonStatus() {
     if (!patreonSession) return;
     ['patreonStatus', 'patreonStatusReg', 'patreonStatusVillage'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.classList.remove('hidden'); el.innerHTML = patreonSession.isPro ? `<span class="text-green-600 font-bold">✓ Patreon ${patreonSession.tier || 'member'} — Pro unlocked</span>` : `<span class="text-gray-600">Signed in — <a href="https://www.patreon.com/chrisptee" target="_blank" class="text-forest font-semibold">upgrade for Pro</a></span>`; }
+        if (el) { el.classList.remove('hidden'); el.innerHTML = patreonSession.isPro ? `<span class="text-green-600 font-bold">✓ Patreon ${patreonSession.tier || 'member'}</span>` : `<span class="text-gray-600">Signed in — not currently an active <a href="https://www.patreon.com/chrisptee" target="_blank" class="text-forest font-semibold">patron</a></span>`; }
     });
     ['patreonSignInBtn', 'patreonSignInBtnReg', 'patreonSignInBtnVillage'].forEach(id => { document.getElementById(id)?.classList.add('hidden'); });
-    if (patreonSession.isPro) { document.getElementById('signInPrompt')?.classList.add('hidden'); document.getElementById('villageSignIn')?.classList.add('hidden'); }
+    if (patreonSession.isPro) { document.getElementById('signInPrompt')?.classList.add('hidden'); document.getElementById('villageSignIn')?.classList.add('hidden'); document.getElementById('honestyBox')?.classList.add('hidden'); }
 }
 
 async function signOut() { await sb.auth.signOut(); currentUser = null; localStorage.removeItem('miniatureoid_patreon_session'); location.reload(); }
