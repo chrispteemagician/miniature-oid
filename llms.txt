@@ -4,7 +4,7 @@
 
 ## Pages
 
-- [Home](https://miniature-oid.co.uk/): Home — AI miniature and wargaming figure identifier
+- [Home](https://miniature-oid.netlify.app/): Home — AI miniature and wargaming figure identifier
 
 ## About
 

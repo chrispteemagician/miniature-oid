@@ -11,7 +11,17 @@ Reg (46 years at the painting table) for technique, gear, and painting advice.
 
 Part of the FeelFamous -Oid Ecosystem.
 
-**Live at:** miniature-oid.co.uk | **Netlify:** auto-deploy on push to main
+**Live at:** miniature-oid.netlify.app | **Netlify:** auto-deploy on push to main
+
+**Domain note (Chris, 2026-07-14):** `miniature-oid.co.uk` is dead — DNS at
+IONOS was never sorted (see DocBrain `rune-hit-compaction.txt`) and Chris has
+given up on it. The Netlify subdomain is now the one and only canonical URL
+everywhere: this file, meta tags, Patreon OAuth `redirect_uri`, footer/share/
+watermark text, `robots.txt`, `sitemap.xml`, `llms.txt`, and every sibling
+-oid's Village cross-link. **Action needed from Chris:** the Patreon app's
+registered Redirect URI must be updated to
+`https://miniature-oid.netlify.app/auth/patreon` in the Patreon developer
+dashboard, or sign-in will fail even though the code now points here.
 
 ---
 
