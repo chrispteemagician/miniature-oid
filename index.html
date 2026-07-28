@@ -1118,7 +1118,8 @@ function showUserStatus() { document.getElementById('userBar').classList.remove(
 async function loadRecentActivity() {
     try {
         const { data } = await sb.from('users').select('username, created_at').order('created_at', { ascending: false }).limit(5);
-        document.getElementById('activityList').innerHTML = data && data.length > 0 ? data.map(u => `<p>${CONFIG.loadingIcon} <strong>${u.username}</strong> joined the village!</p>`).join('') : '<p class="text-center text-gray-400">Be the first to join!</p>';
+        // username is a stored Supabase field shared across the -Oid ecosystem; escape before innerHTML to prevent stored XSS
+        document.getElementById('activityList').innerHTML = data && data.length > 0 ? data.map(u => `<p>${CONFIG.loadingIcon} <strong>${escapeHtml(u.username)}</strong> joined the village!</p>`).join('') : '<p class="text-center text-gray-400">Be the first to join!</p>';
     } catch (e) { console.error('Activity error:', e); }
 }
 
@@ -1129,7 +1130,8 @@ async function loadLeaderboard() {
             document.getElementById('leaderboardList').innerHTML = data.map((u, i) => {
                 const oidCount = u.oid_memberships.length;
                 let badge = 'Villager'; if (oidCount >= 5) badge = 'Spore'; else if (oidCount >= 2) badge = 'Bridge Walker';
-                return `<div class="flex items-center justify-between bg-cream p-4 rounded-xl"><div class="flex items-center gap-3"><span class="text-xl font-bold text-forest">#${i+1}</span><span class="text-sm">${badge}</span><span class="font-bold">@${u.username}</span></div><span class="text-forest font-bold">${u.kudos} Kudos</span></div>`;
+                // username is a stored Supabase field shared across the -Oid ecosystem; escape before innerHTML to prevent stored XSS
+                return `<div class="flex items-center justify-between bg-cream p-4 rounded-xl"><div class="flex items-center gap-3"><span class="text-xl font-bold text-forest">#${i+1}</span><span class="text-sm">${badge}</span><span class="font-bold">@${escapeHtml(u.username)}</span></div><span class="text-forest font-bold">${u.kudos} Kudos</span></div>`;
             }).join('');
         }
     } catch (e) { console.error('Leaderboard error:', e); }
