@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://miniature-oid.co.uk/sitemap.xml
+Sitemap: https://miniature-oid.netlify.app/sitemap.xml
