@@ -176,10 +176,6 @@
     </style>
 </head>
 <body>
-<a href="https://feelfamous-basecamp.netlify.app/" target="_blank" rel="noopener" style="display:block;width:100%;box-sizing:border-box;text-align:center;padding:10px 16px;background:linear-gradient(90deg,#ff00ff,#00ffff,#fbbf24,#ff00ff);background-size:300% auto;animation:wgfShine 4s linear infinite;color:#000;font-family:'Orbitron',Arial,sans-serif;font-weight:800;font-size:0.92rem;letter-spacing:0.3px;text-decoration:none;position:sticky;top:0;z-index:100000;">🎪 I&rsquo;m at Wild Gardens Festival this weekend &mdash; tap here for the Basecamp &rarr;</a>
-<style>@keyframes wgfShine{0%{background-position:0% center}100%{background-position:300% center}}</style>
-
-
 <!-- FOUNDING MEMBER BANNER -->
 <div class="founding-banner">
     🏡 It&#39;s free to use, always will be. <strong>£4.95/month</strong> keeps the village running — hut pages, Kudos, the works.&nbsp;
@@ -521,8 +517,8 @@
             </div>
         </div>
         <div class="flex gap-2">
-            <input type="text" id="regInput" placeholder="Ask Reg anything..." class="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none text-sm" style="border-color: #2d6a4f; min-height: 48px;" onkeypress="if(event.key==='Enter')askReg()">
-            <button onclick="askReg()" class="btn btn-forest px-6" style="min-height:48px;">Send</button>
+            <input type="text" id="regInput" placeholder="Ask Reg anything..." class="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none text-sm" style="border-color: #2d6a4f; min-height: 48px; min-width:0;" onkeypress="if(event.key==='Enter')askReg()">
+            <button onclick="askReg()" class="btn btn-forest px-6" style="min-height:48px; flex-shrink:0;">Send</button>
         </div>
     </div>
 
@@ -1120,7 +1116,8 @@ function showUserStatus() { document.getElementById('userBar').classList.remove(
 async function loadRecentActivity() {
     try {
         const { data } = await sb.from('users').select('username, created_at').order('created_at', { ascending: false }).limit(5);
-        document.getElementById('activityList').innerHTML = data && data.length > 0 ? data.map(u => `<p>${CONFIG.loadingIcon} <strong>${u.username}</strong> joined the village!</p>`).join('') : '<p class="text-center text-gray-400">Be the first to join!</p>';
+        // username is a stored Supabase field shared across the -Oid ecosystem; escape before innerHTML to prevent stored XSS
+        document.getElementById('activityList').innerHTML = data && data.length > 0 ? data.map(u => `<p>${CONFIG.loadingIcon} <strong>${escapeHtml(u.username)}</strong> joined the village!</p>`).join('') : '<p class="text-center text-gray-400">Be the first to join!</p>';
     } catch (e) { console.error('Activity error:', e); }
 }
 
@@ -1131,7 +1128,8 @@ async function loadLeaderboard() {
             document.getElementById('leaderboardList').innerHTML = data.map((u, i) => {
                 const oidCount = u.oid_memberships.length;
                 let badge = 'Villager'; if (oidCount >= 5) badge = 'Spore'; else if (oidCount >= 2) badge = 'Bridge Walker';
-                return `<div class="flex items-center justify-between bg-cream p-4 rounded-xl"><div class="flex items-center gap-3"><span class="text-xl font-bold text-forest">#${i+1}</span><span class="text-sm">${badge}</span><span class="font-bold">@${u.username}</span></div><span class="text-forest font-bold">${u.kudos} Kudos</span></div>`;
+                // username is a stored Supabase field shared across the -Oid ecosystem; escape before innerHTML to prevent stored XSS
+                return `<div class="flex items-center justify-between bg-cream p-4 rounded-xl"><div class="flex items-center gap-3"><span class="text-xl font-bold text-forest">#${i+1}</span><span class="text-sm">${badge}</span><span class="font-bold">@${escapeHtml(u.username)}</span></div><span class="text-forest font-bold">${u.kudos} Kudos</span></div>`;
             }).join('');
         }
     } catch (e) { console.error('Leaderboard error:', e); }

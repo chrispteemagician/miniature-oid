@@ -66,41 +66,30 @@ kit at eight. Straight-talking, no-nonsense, genuinely loves teaching. `chat-reg
 
 ## Free-to-use philosophy (Chris, 2026-07-13 — read before adding any gate)
 
-The core tool — photo identification (both Identify and Roast My Paintjob
-modes) and Ask Reg chat — is free for everyone, no sign-in, no lock icon, no
-"Villager+ only" banner. There was never a hard `isPro` gate on either:
-`analyze-image.js` and `chat-reg.js` have no tier checks at all. `isPro` in
-the frontend only ever drives status-badge display (Patreon sign-in state),
-never blocks identify/chat. Don't gate the tool itself behind Patreon.
+The core tool is free for everyone, no sign-in, no lock icon, no "Villager+
+only" banner. Don't gate the tool itself behind Patreon.
 
-**What Patreon is for:** the Village — a hosted hut/hamlet page, Kudos and
-leaderboard, the village activity feed. Those are real, ongoing Supabase-backed
-costs tied to a persistent public record, so they stay behind membership.
-Frame it honestly — never as a shame-lock ("🔒 ... Founders only ... Unlock
-→"). The Village tab already does this reasonably ("Everything here is free
-to use. Supporting the village keeps it growing.") — left as-is.
+**What Patreon/paid tiers are for:** genuine extras that cost ongoing hosting/
+upkeep and aren't required to use the tool. Frame honestly, never as a
+shame-lock ("🔒 ... Unlock →"). No tier-comparison shop windows, no
+LinkedIn-style "join my community to see what I can do."
 
-**2026-07-13 changes:**
-- Removed a scarcity dark pattern from the Founding Member banner — it read
-  "Founding Member price — first 1,000 only. After that, the door goes up,"
-  which manufactures false urgency (the same pattern found and removed in
-  designer-oid). Reworded to state the real, honest reason to join: "It's
-  free to use, always will be. £4.95/month keeps the village running — hut
-  pages, Kudos, the works."
-- Fixed misleading "Pro unlocked" / "upgrade for Pro" copy in
-  `showPatreonStatus()` — there is no Pro-gated feature in this app, so
-  implying one exists was false advertising. Now shows honest patron status
-  only.
-- Added a one-time honesty-box message (`#honestyBox`) under the result
-  view's action buttons, shown once after an identify/roast result — points
-  to Buy Me a Coffee (one-off) and Patreon (ongoing), hidden automatically
-  once `patreonSession.isPro` is true.
+**The ask, when there is one:** one honest, low-key line after the task
+completes — free to use, tell a mate if it helped, buy-me-a-coffee if you
+want to say thanks (one-off, `buymeacoffee.com/chrispteemagician`), Patreon
+if you want to be a regular. Not a gate. Not gamified.
 
-**The ask, when there is one:** one honest, low-key line after Reg gives a
-result — free to use, tell a mate if it helped, buy-me-a-coffee if you want
-to say thanks (one-off, buymeacoffee.com/chrispteemagician), Patreon if you
-want to be a regular (patreon.com/chrisptee). Not a gate. Not gamified.
+**Repo-specific facts (don't reintroduce these regressions):**
+- `analyze-image.js` and `chat-reg.js` have never had a hard `isPro`/tier
+  gate — `isPro` only drives status-badge display, never blocks
+  identify/chat.
+- Removed a false-scarcity "Founding Member — first 1,000 only" banner.
+- Fixed misleading "Pro unlocked"/"upgrade for Pro" copy that implied a
+  locked feature which doesn't exist.
+- Bucket-2 perk kept gated: the Village (hosted hut/hamlet page, Kudos,
+  leaderboard, activity feed) — real ongoing Supabase-backed cost.
 
+Full doctrine + mechanical pattern: DocBrain `tech/free-to-use-degate-skill.md`.
 This same pattern is rolling out across the rest of the -oid ecosystem —
 check other repos' CLAUDE.md for the shared version before assuming this
 file is the only place it applies.
