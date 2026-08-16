@@ -1,13 +1,13 @@
 # miniature-oid
 
-> Free AI tool for miniature and wargaming collectors. Identify figures, sets, and paint schemes.
+> Free AI tool for miniature and wargaming collectors. Identify figures, sets, and paint schemes, and ask Reg for painting advice.
 
 ## Pages
 
-- [Home](https://miniature-oid.netlify.app/): Home — AI miniature and wargaming figure identifier
+- [Home](https://miniature-oid.netlify.app/): Home — AI miniature/wargaming figure identifier ("The Tiny Curator"), Ask Reg painting-advice chat, and The Village (free hut page + optional Patreon membership from £4.95/month)
 
 ## About
 
 Part of the FeelFamous ecosystem — free AI tools for specialists, collectors, and personal sellers.
 Built by Chris P Taylor (Doc Strange). PLUR. World domination through kindness. One ember at a time.
-Contact: chris@chrisptee.com
+Contact: chris@chrisptee.co.uk
