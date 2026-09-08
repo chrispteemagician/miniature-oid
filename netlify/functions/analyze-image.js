@@ -188,6 +188,7 @@ Format as JSON:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Referer': 'https://www.feelfamous.co.uk/',
         },
         body: JSON.stringify({
           contents: [{
